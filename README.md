@@ -1,0 +1,2 @@
+# PlayableSephiroth
+Incomplete sephiroth character
