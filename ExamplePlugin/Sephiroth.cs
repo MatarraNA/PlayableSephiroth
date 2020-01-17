@@ -405,7 +405,7 @@ namespace Sephiroth
             // register networking
             RegisterNetworking();
         }
-
+        
         private void RegisterNetworking()
         {
             var rpc = MiniRpc.CreateInstance(MODUID);
@@ -882,15 +882,6 @@ namespace EntityStates.Sephiroth
         {
             base.FixedUpdate();
 
-            if( base.isAuthority )
-            {
-                // move in direction of hit
-                if( ForceMove() )
-                {
-                    // movement went off
-                }
-            }
-
             if (base.fixedAge >= this.hitDuration && base.isAuthority)
             {
                 this.outer.SetNextStateToMain();
@@ -898,48 +889,6 @@ namespace EntityStates.Sephiroth
             }
         }
        
-        private Vector3 moveDir;
-        private float maxForceMoveDist = 25f;
-        private float minDistance = 5.0f;
-        private float forceSpeedMulti = 3f; // gets calc'd from distance instead
-        private Transform lockOnEnemy = null;
-        private bool ForceMove()
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(base.transform.position, base.inputBank.aimDirection, out hit, maxForceMoveDist, LayerIndex.entityPrecise.mask))
-            {
-                // bingo we have a winner, check if unit is dead
-                var hurtbox = hit.collider.transform.root.GetComponentInChildren<HurtBox>();
-                    
-                if( hurtbox != null)
-                {
-                    var healthComp = hurtbox.healthComponent;
-                    if (healthComp == null) return false;
-                    Vector3 hitPos = new Vector3(hit.point.x, base.transform.position.y, hit.point.z);
-                    if( healthComp.alive && Vector3.Distance(hitPos, base.transform.position) >= minDistance )
-                    {
-                        if( healthComp.body != null )
-                        {
-                            if( !healthComp.body.isFlying )
-                            {
-                                lockOnEnemy = hit.collider.transform;
-                            }
-                        }
-                    }
-                }
-            }
-            if( lockOnEnemy != null )
-            {
-                
-                moveDir = (lockOnEnemy.transform.position - base.transform.position).normalized;
-                forceSpeedMulti = Vector3.Distance(lockOnEnemy.transform.position, base.transform.position);
-                return true;
-            }
-
-            // failed to find suitable enemy
-            return false;
-        }
-
         private float GetAnimationTime(string clipName, float customSpeedScale = 1f)
         {
             if (customSpeedScale != 1)
